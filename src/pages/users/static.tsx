@@ -1,5 +1,10 @@
 import axios from "axios";
-import { GetServerSideProps, NextPage } from "next";
+import {
+  GetServerSideProps,
+  GetStaticPaths,
+  GetStaticProps,
+  NextPage,
+} from "next";
 import { useEffect, useState } from "react";
 
 type User = {
@@ -8,9 +13,10 @@ type User = {
 
 type UserPageProps = {
   users: User[];
+  date: string;
 };
 
-const UsersPage: NextPage<UserPageProps> = (props) => {
+const UsersStaticPage: NextPage<UserPageProps> = (props) => {
   // const [users, setUsers] = useState([]);
 
   // useEffect(() => {
@@ -22,11 +28,11 @@ const UsersPage: NextPage<UserPageProps> = (props) => {
   //     });
   // }, []);
 
-  const { users } = props;
+  const { users, date } = props;
 
   return (
     <div>
-      <h1>Users</h1>
+      <h1>Users static - {date} </h1>
       <ul>
         {users.map((user: any, key) => (
           <li key={key}>{user.name}</li>
@@ -36,9 +42,9 @@ const UsersPage: NextPage<UserPageProps> = (props) => {
   );
 };
 
-export default UsersPage;
+export default UsersStaticPage;
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const { data } = await axios.get(
     "https://my-json-server.typicode.com/MiqueiasCS/nextjs-test/db"
   );
@@ -48,6 +54,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
       users,
+      date: new Date().getTime(),
     },
+    revalidate: 10,
   };
 };
+// /users/static -> 10s
+// /users/static/[id]
